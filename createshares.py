@@ -6,7 +6,7 @@ import csv
 def generate_shares(num_shares):
     list_shares = []
     for i in range(num_shares):
-        share = (random.randint(1, 100), random.randint(1, 20))
+        share = (f"Action-{i+1}", random.randint(1, 100), random.randint(1, 20))
         list_shares.append(share)
     return list_shares
     
@@ -14,11 +14,12 @@ def generate_shares(num_shares):
 def write_shares_file(random_shares_file, list_shares):
     with open(random_shares_file, "w") as csvfile:
         writer = csv.writer(csvfile, delimiter=";")
+        writer.writerow(["Action", "Cout par action", "Benefice"])
         for share in list_shares:
             writer.writerow(share)
 
 
-
+# python3 createshares.py randomshares.csv 10000
 def main(args):
     if len(args) < 3:
         print(f"usage : {args[0]} csv_file num_shares", file=sys.stderr)

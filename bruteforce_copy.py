@@ -19,20 +19,21 @@ def read_csv_file(csv_filename): #Recup des valeurs du fichier.csv indiqué en e
             shares.append(share)
     return shares
 
-def compute_standard_deviation(collection):
-    count = len(collection)
-    mean = sum(collection) / count
-    variance = sum((element - mean)**2 for element in collection) / count
-    return math.sqrt(variance)
-    
+
+def knapsack01(max_investment, performances):
+    if max_investment == 0 or not performances:
+        return 0
+    if performances[-1].price > max_investment:
+        return knapsack01(max_investment, performances[:-1])
+    else:
+        return max(performances[-1].price + knapsack01(max_investment - performances[:-1].price, performances[:-1]), knapsack01(max_investment, performances[:-1]))
+
 
 def get_max_performance(shares, max_amount):
     start = time.time()
-    std = compute_standard_deviation([*map(lambda share: share.performance, shares)])
-    print(f"Ecart type des performances : {std}")
-    performances = list(filter(lambda share: share.performance > std, shares))
     # Ici on trie les actions de la plus performante à la moins performante selon leurs rendement
-    performances = sorted(performances, key=lambda share: share.performance,  reverse=True)
+    performances = sorted(shares, key=lambda share: share.performance,  reverse=True)
+    
     # Ici on stock la performance maximum et la liste des actions qui correspondent
     max_performance = 0
     max_spent_amount = 0
@@ -77,15 +78,14 @@ def main(args):
         print(f"usage : {args[0]} csv_file max_amount", file=sys.stderr)
         raise SystemExit(-1)   
     csv_filename, max_amount, *_ = args[1:]
-    print("_________________________________________________________________________________________________________\n")
-    print(f"Calcul du rendement sur le dataset : {csv_filename} avec un montant investi de : {max_amount} euros\n")
+    print()
+    print(f"Calcul du rendement sur le dataset : {csv_filename} avec un montant investi de : {max_amount} euros")
     shares = read_csv_file(csv_filename)
     get_max_performance(shares, int(max_amount))
 
 if __name__ == "__main__":
     main(sys.argv)
     
-
 
     
     

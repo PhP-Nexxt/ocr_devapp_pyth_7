@@ -5,9 +5,11 @@ import sys #K systemes
 from collections import namedtuple
 import time
 
-Share = namedtuple("Share", ["name", "price", "rate", "performance"]) # Creation d'un namedtuple(Attributs)
+# Creation d'un namedtuple(Attributs) afin d'avoir un objet share facile  manipuler
+Share = namedtuple("Share", ["name", "price", "rate", "performance"]) 
 
-def read_csv_file(csv_filename): #Recup des valeurs du fichier.csv indiqué en entrée et on calcul directement les performances au chargement(Car on ne peut acheter qu'une seule action de chaque)
+#Recup des valeurs du fichier.csv indiqué en entrée et on calcul directement les performances au chargement(Car on ne peut acheter qu'une seule action de chaque)
+def read_csv_file(csv_filename): 
     shares = []
     with open(csv_filename) as csvfile:
         reader = csv.reader(csvfile, delimiter=";")
@@ -19,7 +21,8 @@ def read_csv_file(csv_filename): #Recup des valeurs du fichier.csv indiqué en e
             shares.append(share)
     return shares
 
-
+# methode brute force 1 qui ne fonctionne pas car trop d'appels récursifs sur des grandes listes
+# Limite ne fonctionne pas si trop appels récursifs
 def knapsack01(max_investment, shares):
     if max_investment == 0 or not shares:
         return 0
@@ -27,13 +30,14 @@ def knapsack01(max_investment, shares):
         return knapsack01(max_investment, shares[:-1])
     else:
         return max(shares[-1].performance + knapsack01(max_investment - shares[-1].price, shares[:-1]), knapsack01(max_investment, shares[:-1]))
-    
-    
-# https://medium.com/swlh/dynamic-programming-0-1-knapsack-python-code-222e607a2e8
+
+# Methode Brute force avec approche dynamique : contrirement à la récursivité(brute force 1) 
+# on utilise une approche itérative et onstock les résultats intermédiaires en mémoires
+# Limite on stock les résultats intermédiaires en mémoire, ne foncionne pas si peu de ram disponible
 def knapsack02(max_investment, shares):
     max_investment_cts = max_investment * 100
-    results = [[0] * (max_investment_cts + 1)] * (len(shares) + 1)
-    shares_list = [[list()] * (max_investment_cts + 1)] * (len(shares) + 1)
+    results = [[0 for _ in range(max_investment_cts + 1)] for _ in range(len(shares) + 1)]
+    shares_list = [[list() for _ in  range(max_investment_cts + 1)] for _ in range(len(shares) + 1)]
     for i in range(len(shares) + 1):
         for investment in range(max_investment_cts + 1):
             price_cts = round(shares[i-1].price * 100)
@@ -49,28 +53,29 @@ def knapsack02(max_investment, shares):
                 else:
                     results[i][investment] = results[i-1][investment]
                     shares_list[i][investment] = list(shares_list[i-1][investment])
-                #v results[i][investment] = max(shares[i-1].performance + results[i-1][investment - price_cts], results[i-1][investment])
             else:
                 results[i][investment] = results[i-1][investment]
                 shares_list[i][investment] = list(shares_list[i-1][investment])
     return results[len(shares)][max_investment_cts], shares_list[len(shares)][max_investment_cts]
 
-
+# Ici on calcul la performance maximum en fonction du montant à placer des et actions disponibles 
 def get_max_performance(shares, max_amount):
     start = time.time()
-    # Ici on trie les actions de la plus performante à la moins performante selon leurs rendement
+    
+    # Ici on trie les actions de moins chère à la plus chère
     sorted_shares = sorted(shares, key=lambda share: share.price)
     max_performance, best_shares = knapsack02(max_amount, sorted_shares)
     print(f"Performance maximale {max_performance}")
     # on imprime les résultats
+    invested_amout = sum(share.price for share in best_shares)
     print(f"\nAvec {max_amount} euros d'investissement, vous pouvez maximiser votre randement en achetant : \n" )
     for share in best_shares:
         print(f"> 1 action -{share.name}- à {share.price} euros à {share.rate} % sur 2 ans (Performance = {share.performance} euros)")
     print(f"\n> Performance totale : {round(max_performance, 2)} euros\n")
-    # print(f"Total dépensé {max_amount - max_spent_amount} euros \n")
-    
+    print(f"> Avec un mpntant investit de {invested_amout}\n")
+
     end = time.time()
-    print(f"> Temps d'éxecution du programme : {end-start} secondes \n")
+    print(f"> Temps d'éxecution du programme : {end-start} secondes\n")
 
 # Lancement du programme avec nom du fichier.py choixdudataset.csv et montant choisi
 def main(args):

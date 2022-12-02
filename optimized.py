@@ -17,6 +17,7 @@ def read_csv_file(csv_filename): #Recup des valeurs du fichier.csv indiqué en e
             price, rate = map(float, row[1:])
             share = Share(name, price, rate, round(price * (rate / 100), 2)) # 2chiffres apres la virgule
             shares.append(share)
+            #print(share) > Pour afficher la performance de chaque ligne du dataset
     return shares
 
 # On calcul la performance avec des actions triés par performance (Rendement brut / prix)
@@ -32,10 +33,8 @@ def greedy_algorithm(investment, shares):
 
 def get_max_performance(shares, max_amount):
     start = time.time()
-
     # Écarte les mauvaises lignes
     shares = list(filter(lambda share: share.price > 0, shares))
-
     # Ici on trie les actions de la plus performante à la moins performante (selon calcul du rendement brut / Prix)
     sorted_shares = sorted(shares, key=lambda share: share.performance/share.price, reverse=True)
     max_performance, best_shares = greedy_algorithm(max_amount, sorted_shares)

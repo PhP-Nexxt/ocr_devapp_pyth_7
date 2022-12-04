@@ -10,6 +10,7 @@ La technique utilisée est un calcul dynamique basé sur la probleme du "sac a d
 Permet d'extraire la meilleurs performance financiere d'un jeu de données `nom de l'action;Prix de l'action;performance de l'action` sur une période
 La technique utilisée est l'utilisation d'un algorithme "Glouton" qui vient récuperer directement les meilleurs performances
 
+
 # Installation
 No virtual environment required` The functions, classes and collections used are native to the python3 library
 
@@ -20,5 +21,3 @@ The technique used is a dynamic calculation based on the "knapsack" problem
 # optimized.py
 Allows to extract the best financial performance from a set of data `share name;share price;share performance` over a period
 The technique used is the use of a "Glutton" algorithm that directly retrieves the best performances
-
-Translated with www.DeepL.com/Translator (free version)
